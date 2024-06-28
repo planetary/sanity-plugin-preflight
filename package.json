@@ -7,7 +7,7 @@
     "sanity-plugin"
   ],
   "license": "MIT",
-  "author": "Planetary <team@planetary.co>",
+  "author": "Planetary Corporation <team@planetary.co>",
   "sideEffects": false,
   "type": "commonjs",
   "exports": {

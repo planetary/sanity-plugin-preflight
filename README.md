@@ -54,7 +54,7 @@ export const getDefaultDocumentNode = ({schemaType}) => {
 
 ## License
 
-[MIT](LICENSE) © Planetary
+[MIT](LICENSE) © [Planetary Corporation](https://planetary.co)
 
 ## Develop & test
 
