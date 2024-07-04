@@ -15,7 +15,7 @@ Current available checks include:
 ## Installation
 
 ```sh
-npm install sanity-plugin-preflight
+npm install @planetary/sanity-plugin-preflight
 ```
 
 ## Usage
@@ -25,7 +25,7 @@ If you don't have a custom Structure Builder configuration, please see [the offi
 
 ```ts
 // deskStructure.ts
-import {Preflight, DeadLinks} from 'sanity-plugin-preflight'
+import {Preflight, DeadLinks} from '@planetary/sanity-plugin-preflight'
 import {RocketIcon} from '@sanity/icons'
 
 export const getDefaultDocumentNode = ({schemaType}) => {
@@ -52,10 +52,6 @@ export const getDefaultDocumentNode = ({schemaType}) => {
 }
 ```
 
-## License
-
-[MIT](LICENSE) © [Planetary Corporation](https://planetary.co)
-
 ## Develop & test
 
 This plugin uses [@sanity/plugin-kit](https://github.com/sanity-io/plugin-kit)
@@ -63,3 +59,14 @@ with default configuration for build & watch scripts.
 
 See [Testing a plugin in Sanity Studio](https://github.com/sanity-io/plugin-kit#testing-a-plugin-in-sanity-studio)
 on how to run this plugin with hotreload in the studio.
+
+### Release new version
+
+Run ["CI & Release" workflow](https://github.com/planetary/sanity-plugin-preflight/actions/workflows/main.yml).
+Make sure to select the main branch and check "Release new version".
+
+Semantic release will only release on configured branches, so it is safe to run release on any branch.
+
+## License
+
+[MIT](LICENSE) © [Planetary Corporation](https://planetary.co)
