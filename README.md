@@ -8,7 +8,7 @@ prior to publishing content.
 Current available checks include:
 
 - [Dead Links](./src/DeadLinks/): Ensure that all links in a document are reachable.
-- (WIP) SEO Audit: Automated report for SEO best practices.
+- [SEO Audit](./src/SEOAudit/): Automated report for SEO best practices.
 
 ![Screenshot 2024-06-19 at 09 39 41@2x](https://github.com/planetary/sanity-plugin-link-check/assets/1646307/b8b2aa63-4ad6-480f-b24e-52ffb6ef57b1)
 
