@@ -11,7 +11,7 @@ document schema.
 
 The field name can be customized by passing a configuration object to the plugin.
 
-```
+```ts
 Preflight({
   plugins: [
     DeadLinks({
