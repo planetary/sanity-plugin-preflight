@@ -6,6 +6,7 @@ type PortableTextLink = {
   href: string
 }
 
+export type LinkKeys<K extends object> = (keyof K)[]
 export const isPortableTextLink = (mark: PortableTextObject): mark is PortableTextLink => {
   return Boolean(mark._type === 'link' && 'href' in mark)
 }
