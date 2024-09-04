@@ -33,7 +33,7 @@ export type SEOAuditConfig = {
    * A function that returns the URL to check.
    * Receives the active Sanity document, draft status, and baseUrl as an arguments.
    */
-  getDocumentSlug?: (document: Partial<SanityDocument>) => string
+  getDocumentSlug?: (document: Partial<SanityDocument>, isDraft?: boolean) => string
 
   /**
    * The Sanity schema field name containing the array of content blocks in the document.
@@ -46,14 +46,14 @@ type Props = UserViewComponent['defaultProps']
 
 const Extracted = ({config, document}: {config: SEOAuditConfig} & Props) => {
   const {secrets} = useSecrets<Record<string, string>>(config.secretsNamespace)
-  const API_KEY = secrets?.DATA_FOR_SEO_API_KEY
+  const API_KEY = btoa(`${secrets?.DATA_FOR_SEO_API_LOGIN}:${secrets?.DATA_FOR_SEO_API_PASSWORD}`)
 
-  if (!API_KEY) {
+  if (!secrets?.DATA_FOR_SEO_API_LOGIN) {
     return (
       <div>
         <SectionHeader title="SEO Audit" />
 
-        <MissingSecretError />
+        <MissingSecretError secretsNamespace={config.secretsNamespace} />
       </div>
     )
   }
@@ -67,17 +67,23 @@ const Extracted = ({config, document}: {config: SEOAuditConfig} & Props) => {
     )
   }
 
-  const baseUrl =
-    config.baseUrl ?? process.env.SANITY_STUDIO_SERVER_HOSTNAME ?? window.location.origin
+  const isDraft = document.displayed._id?.startsWith('drafts.')
   const slug =
-    config.getDocumentSlug?.(document.displayed) ??
-    new URL(
-      (document.displayed.slug as unknown as {current: string}).current as unknown as string,
-      baseUrl,
-    ).toString()
+    config.getDocumentSlug?.(document.displayed, isDraft) ??
+    ((document.displayed.slug as unknown as {current: string})?.current as unknown as string)
+
+  if (!slug) {
+    return (
+      <div>
+        <SectionHeader title="SEO Audit" />
+        <p>No slug found</p>
+      </div>
+    )
+  }
 
   return <SEOAuditResults {...config} apiKey={API_KEY} publicUrl={slug} />
 }
+
 /**
  * A plugin that checks the status of all links in a document,
  * ensuring that they are reachable.
@@ -89,7 +95,11 @@ const defaultConfig: SEOAuditConfig = {
   rules: defaultSeoValidationRules,
 }
 
-export const SEOAudit = (config: SEOAuditConfig = defaultConfig): PreflightPlugin => {
+export const SEOAudit = (
+  config: Pick<SEOAuditConfig, 'rules' | 'baseUrl' | 'getDocumentSlug'> & {
+    secretsNamespace?: string
+  } = defaultConfig,
+): PreflightPlugin => {
   const WithConfigWrapper = (props: Props) => {
     return (
       <SEOAuditPlugin

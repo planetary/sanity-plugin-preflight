@@ -44,18 +44,15 @@ These checks are run using the [Instant Pages (Live)](https://docs.dataforseo.co
 
 Usage of this service requires registration and creation of an API key, however usage with placeholder/sandbox data doesn't require payment.
 
-To create and set an API key, [follow the instructions here](https://docs.dataforseo.com/v3/auth/).
+To create and get an API key, [follow the instructions here](https://docs.dataforseo.com/v3/auth/).
 
-For security, secrets are managed using the [`studio-secrets` plugin](https://github.com/sanity-io/sanity-studio-secrets), since Sanity Studio is a client-side application
-and does not have server-side capabilities to securely store secrets.
+For security, secrets are managed using the [`studio-secrets` plugin](https://github.com/sanity-io/sanity-studio-secrets), since Sanity Studio is a client-side application  and does not have server-side capabilities to securely store secrets.
 
-Follow the instructions in the `studio-secrets` plugin to create a new secret named `DATA_FOR_SEO_API_KEY`.
-
-This API key only needs to be set once by the project administrator, and will be shared by all content editors.
+You will set the secrets in the plugin, prior to first audit. This API key only needs to be set once by the project administrator, and will be shared by all content editors.
 
 ### Secrets Namespace
 
-The secrets namespace used can be configured by passing a `secretsNamespace` option to the `Preflight` plugin.
+The secrets namespace used can be, optionally, configured by passing a `secretsNamespace` option to the `Preflight` plugin.
 
 By default the plugin will look for it under the `SANITY_SECRETS` namespace.
 
@@ -90,7 +87,6 @@ First we will configure Next.js to serve draft articles for requests coming in f
 // route handler with secret and slug
 import { draftMode } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { seoAuditIPs } from '@planetary/sanity-plugin-preflight'
 
 export async function GET(request: Request) {
   // Parse query string parameters
@@ -100,13 +96,7 @@ export async function GET(request: Request) {
 
   // Check the secret and next parameters
   // This secret should only be known to this route handler and the CMS
-  if (
-    !slug ||
-    (
-      secret !== 'MY_SECRET_TOKEN' ||
-      !seoAuditIPs.includes(request.headers.get('x-vercel-forwarded-for')
-    )
-  ) {
+  if (!slug || secret !== process.env.YOUR_PREVIEW_TOKEN) {
     return new Response('Invalid token', { status: 401 })
   }
 
@@ -138,7 +128,7 @@ Preflight({
       baseUrl: 'https://example.org',
       getDocumentSlug: (document, isDraft) => {
         if (isDraft) {
-          return `/draft/route?slug=${document.slug.current}`
+          return `/draft/route?slug=${document.slug.current}&secret=${YOUR_PREVIEW_TOKEN}`
         }
 
         return document.slug.current

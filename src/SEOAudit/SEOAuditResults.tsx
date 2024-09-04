@@ -1,6 +1,7 @@
 import {RefreshIcon} from '@sanity/icons'
-import {Card, Code, Flex, Spinner, Text} from '@sanity/ui'
+import {Button, Card, Code, Flex, Spinner, Text} from '@sanity/ui'
 import {useCallback, useState} from 'react'
+import {SettingsView} from '@sanity/studio-secrets'
 
 import {SectionHeader} from '../Preflight/SectionHeader'
 import {SEOAuditConfig} from '.'
@@ -9,16 +10,24 @@ import {InitialLoadMessage} from './InitialLoadMessage'
 import {SEOAuditChecks} from './SEOAuditTypes'
 import {getPageLiveResult} from './seoClient'
 import {defaultSeoValidationRules, isRuleEnabled, isValidationRule} from './validations'
+import {pluginConfigKeys} from '../utils/configKeys'
 
 type Props = SEOAuditConfig & {
   apiKey: string
   publicUrl: string
 }
 
-export const SEOAuditResults = ({publicUrl, apiKey, rules}: Props): JSX.Element => {
-  const isLocalhost = publicUrl?.includes('localhost') || publicUrl?.includes('127.0.0')
+export const SEOAuditResults = ({
+  baseUrl,
+  publicUrl,
+  apiKey,
+  rules,
+  secretsNamespace,
+}: Props): JSX.Element => {
+  const isLocalhost = !!baseUrl && (baseUrl?.includes('localhost') || baseUrl?.includes('127.0.0'))
 
-  const [isLoading, setIsLoading] = useState(true)
+  const [showSettings, setShowSettings] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   const [results, setResults] = useState<Partial<SEOAuditChecks>>()
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
@@ -30,7 +39,11 @@ export const SEOAuditResults = ({publicUrl, apiKey, rules}: Props): JSX.Element 
     setIsLoading(true)
 
     try {
-      const liveResults = await getPageLiveResult(apiKey)(publicUrl, isLocalhost)
+      const liveResults = await getPageLiveResult(apiKey)(
+        `${isLocalhost ? 'https://example.org' : baseUrl}/${publicUrl}`,
+        isLocalhost,
+      )
+
       const checks: SEOAuditChecks | undefined =
         liveResults?.tasks?.[0]?.result?.[0]?.items?.[0]?.checks
 
@@ -136,6 +149,34 @@ export const SEOAuditResults = ({publicUrl, apiKey, rules}: Props): JSX.Element 
             <CheckResultCard key={key} checkName={key} result={result} />
           ))}
         </div>
+      )}
+
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'flex-end',
+          margin: '1rem 0 0',
+        }}
+      >
+        <Button
+          onClick={() => setShowSettings(true)}
+          style={{marginLeft: 'auto'}}
+          text="Update Secret"
+          tone="default"
+          mode="ghost"
+          fontSize={1}
+        />
+      </div>
+
+      {showSettings && (
+        <SettingsView
+          title="Preflight: SEO Audit API Key"
+          namespace={secretsNamespace}
+          keys={pluginConfigKeys}
+          onClose={() => {
+            setShowSettings(false)
+          }}
+        />
       )}
     </>
   )
