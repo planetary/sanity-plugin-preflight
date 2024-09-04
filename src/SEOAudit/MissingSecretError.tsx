@@ -57,15 +57,23 @@ export const MissingSecretError: FC<{secretsNamespace: string}> = ({secretsNames
         }}
       >
         To use the SEO Audit plugin, you will need to sign up for a{' '}
-        <a href="http://dataforseo.com/" target="_blank">
+        <a href="http://dataforseo.com/" target="_blank" rel="noreferrer">
           DataForSEO
         </a>{' '}
         account and obtain an API key. These checks are run using the{' '}
-        <a href="https://docs.dataforseo.com/v3/on_page/instant_pages" target="_blank">
+        <a
+          href="https://docs.dataforseo.com/v3/on_page/instant_pages"
+          target="_blank"
+          rel="noreferrer"
+        >
           Instant Pages (Live)
         </a>{' '}
         endpoint. Pricing can be{' '}
-        <a href="https://dataforseo.com/help-center/cost-of-onpage-api-parameters" target="_blank">
+        <a
+          href="https://dataforseo.com/help-center/cost-of-onpage-api-parameters"
+          target="_blank"
+          rel="noreferrer"
+        >
           found here
         </a>
         .
