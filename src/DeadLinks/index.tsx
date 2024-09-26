@@ -8,6 +8,7 @@ import {getStyleByStatus} from '../utils/getStyleByStatus'
 import {checkLink} from './checkLink'
 import {getDocumentLinks} from './getDocumentLinks'
 import {StatusIcon} from './StatusIcon'
+import {LinkKeys} from '../utils/guards'
 
 export type LinkStatus = 'initial' | 'checking' | 'success' | 'error'
 export type LinkCheckResult = {
@@ -16,12 +17,13 @@ export type LinkCheckResult = {
 }
 export type LinkResults = Record<string, LinkCheckResult>
 
-type Config = {
+type Config<K extends Record<string, unknown> = Record<string, unknown>> = {
   /**
    * The Sanity schema field name containing the array of content blocks in the document.
    * Default value: 'content'
    */
   content: string
+  overrideLinkKeys?: LinkKeys<K>
 }
 
 type Props = UserViewComponent['defaultProps']
@@ -30,10 +32,16 @@ type Props = UserViewComponent['defaultProps']
  * A plugin that checks the status of all links in a document,
  * ensuring that they are reachable.
  */
-const DeadLinksPlugin = ({config, ...props}: Props & {config: Config}) => {
+const DeadLinksPlugin = <K extends Record<string, unknown> = Record<string, unknown>>({
+  config,
+  ...props
+}: Props & {
+  config: Config<K>
+}) => {
   const contentBlocks = props?.document?.displayed[config.content] || []
-
-  const [linkResults, setLinkResults] = useState<LinkResults>(getDocumentLinks(contentBlocks))
+  const [linkResults, setLinkResults] = useState<LinkResults>(
+    getDocumentLinks(contentBlocks, config.overrideLinkKeys),
+  )
 
   const resultsArray = Object.entries(linkResults)
   const isInitial = resultsArray.every(([, status]) => status.status === 'initial')
@@ -148,11 +156,9 @@ const DeadLinksPlugin = ({config, ...props}: Props & {config: Config}) => {
   )
 }
 
-const defaultConfig: Config = {
-  content: 'content',
-}
-
-export const DeadLinks = (config: Config = defaultConfig): PreflightPlugin => {
+export const DeadLinks = <K extends Record<string, unknown> = Record<string, unknown>>(
+  config: Config<K>,
+): PreflightPlugin => {
   const WithConfigWrapper = (props: Props) => {
     return <DeadLinksPlugin config={config} {...props} />
   }
