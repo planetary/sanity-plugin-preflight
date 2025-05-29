@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 
-import {OnPageApi, OnPageTaskPostResponseInfo} from 'dataforseo-client'
+import {OnPageApi, OnPageTaskPostRequestInfo} from 'dataforseo-client'
 
 const apiHost = 'https://api.dataforseo.com'
 const demoHost = 'https://sandbox.dataforseo.com'
@@ -35,10 +35,10 @@ const getOnPageDemoClient = (apiKey: string) => {
  */
 export const getPageLiveResult =
   (apiKey: string) =>
-  async (pageURL: string, isDemoMode: boolean): Promise<OnPageTaskPostResponseInfo | null> => {
+  async (pageURL: string, isDemoMode: boolean): Promise<OnPageTaskPostRequestInfo | null> => {
     const onPageClient = isDemoMode ? getOnPageDemoClient(apiKey) : getOnPageClient(apiKey)
 
-    const task = new OnPageTaskPostResponseInfo({
+    const task = new OnPageTaskPostRequestInfo({
       url: pageURL,
       max_crawl_pages: 1,
       check_spell: true,
